@@ -185,7 +185,7 @@ export default class Websock {
         this._websocket = null;
     }
 
-    open(uri, protocols) {
+    open(urls, protocols) {
         this.init();
 
         const self = this;
@@ -194,20 +194,14 @@ export default class Websock {
                 self._readableStreamController = ctrl;
             }
         });
-        // TODO: Hard code
-        const pipingServerUrl = "https://ppng.io"
-        // TODO: Hard code paths
-        const path1 = "aaa";
-        const path2 = "bbb";
-
-        fetch(`${pipingServerUrl}/${path1}`, {
+        fetch(urls.clientToServerUrl, {
             method: "POST",
             body: readable,
             allowHTTP1ForStreamingUpload: true,
             signal: this._abortController.signal,
         });
         (async () => {
-            const getResPromise = fetch(`${pipingServerUrl}/${path2}`, {
+            const getResPromise = fetch(urls.serverToClientUrl, {
                 signal: this._abortController.signal,
             });
             const getRes = await getResPromise;

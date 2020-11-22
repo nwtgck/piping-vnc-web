@@ -13,10 +13,10 @@
     or the fragment:
         http://example.com/#host=HOST&port=PORT&encrypt=1
     -->
-    <title>noVNC</title>
+    <title>Piping VNC</title>
 
     <meta charset="utf-8">
-    
+
     <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
                 Remove this if you use the .htaccess -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -206,7 +206,8 @@
                                 <label for="noVNC_setting_repeaterID">Repeater ID:</label>
                                 <input id="noVNC_setting_repeaterID" type="text" value="">
                             </li>
-                            <li>
+                            <!-- TODO: remove -->
+                            <li style="display: none">
                                 <div class="noVNC_expander">WebSocket</div>
                                 <div><ul>
                                     <li>
@@ -275,7 +276,26 @@
     <!-- Connect button -->
     <div class="noVNC_center">
         <div id="noVNC_connect_dlg">
-            <div class="noVNC_logo" translate="no"><span>no</span>VNC</div>
+            <div class="noVNC_logo" translate="no"><span>Piping</span>VNC</div>
+            <div style="font-size: 1.5em;" class="noVNC_logo" translate="no">
+                <span style="color: #ccc; font-size: 0.8em;">powered by </span>
+                <span>no</span>VNC
+            </div>
+            <table style="background: #ccc; border-radius: 12px; padding: 0.8em; display: block; margin-bottom: 1em;">
+                <tr>
+                    <td>Piping Server</td><td><input id="piping_server_input" value="https://ppng.io"></td>
+                </tr>
+                <tr>
+                    <td>Path1</td><td><input id="path1_input"></td>
+                </tr>
+                <tr>
+                    <td>Path2</td><td><input id="path2_input"></td>
+                </tr>
+            </table>
+            <div style="background: #ccc; border-radius: 12px; padding: 0.8em; margin-bottom: 1em;">
+                Command hint:<br>
+                <textarea id="server_host_command_hint_textarea" style="width: 100%"></textarea>
+            </div>
             <div id="noVNC_connect_button"><div>
                 <img alt="" src="app/images/connect.svg"> Connect
             </div></div>

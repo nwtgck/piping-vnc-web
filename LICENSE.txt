@@ -1,4 +1,5 @@
 noVNC is Copyright (C) 2019 The noVNC Authors
+Piping VNC is Copyright (C) 2020 Ryo Ota
 (./AUTHORS)
 
 The noVNC core library files are licensed under the MPL 2.0 (Mozilla

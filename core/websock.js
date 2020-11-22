@@ -210,9 +210,9 @@ export default class Websock {
             this._eventHandlers.open();
             const reader = getRes.body.getReader();
             reader.closed.then(() => {
-                Log.Debug(">> Closed")
+                Log.Debug(">> Closed");
             });
-            while(true) {
+            while (true) {
                 const {value, done} = await reader.read();
                 if (done) break;
                 this._recvMessage(value);
@@ -221,7 +221,7 @@ export default class Websock {
     }
 
     close() {
-        if(this._abortController.signal) {
+        if (this._abortController.signal) {
             Log.Info("Closing HTTPS connection over Piping Server");
             this._abortController.abort();
         }

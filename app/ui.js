@@ -19,7 +19,7 @@ import * as WebUtil from "./webutil.js";
 
 const PAGE_TITLE = "Piping VNC";
 
-function randomString(len){
+function randomString(len) {
     const nonConfusingChars = ["a", "b", "c", "d", "e", "f", "h", "i", "j", "k", "m", "n", "p", "r", "s", "t", "u", "v", "w", "x", "y", "z", "2", "3", "4", "5", "6", "7", "8"];
     const randomArr = window.crypto.getRandomValues(new Uint32Array(len));
     return Array.from(randomArr).map(n => nonConfusingChars[n % nonConfusingChars.length]).join('');
@@ -34,7 +34,7 @@ function createCommandHint() {
 
     const escapedPipingServerUrl = pipingServerUrl.replace(/:/g, '\\:').replace(/\/$/, '');
 
-    const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`
+    const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`;
 
     return socatCommand;
 }
@@ -421,12 +421,13 @@ const UI = {
         switch (state) {
             case 'init':
                 break;
-            case 'connecting':
+            case 'connecting': {
                 const commandHint = createCommandHint();
                 transitionElem.innerHTML = _("Connecting...") + `<br><span style="font-size: 0.8em;">Command hint:<br>${commandHint}</span>`;
                 // transitionElem.textContent = _("Connecting...");
                 document.documentElement.classList.add("noVNC_connecting");
                 break;
+            }
             case 'connected':
                 document.documentElement.classList.add("noVNC_connected");
                 break;

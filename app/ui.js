@@ -196,6 +196,20 @@ const UI = {
         UI.initSetting('reconnect', false);
         UI.initSetting('reconnect_delay', 5000);
 
+        // (base: https://web.dev/fetch-upload-streaming/#feature-detection)
+        const supportsRequestStreams = !new Request('', {
+            body: new ReadableStream(),
+            method: 'POST',
+        }).headers.has('Content-Type');
+
+        // If not support fetch() upload streaming
+        if (!supportsRequestStreams) {
+            // Hide login card
+            document.getElementById('input_form').style.display = "none";
+            // Show message
+            document.getElementById('not_supported_message').style.display = null;
+        }
+
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
         clientToServerPathInput.value = randomString(3);
@@ -1064,8 +1078,6 @@ const UI = {
         const pipingServerUrl = pipingServerInput.value.replace(/\/$/, '');
         const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
         const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
-        console.log('inputs: ', pipingServerInput.value, clientToServerPathInput.value, serverToClientPathInput.value, url);
-
 
         UI.rfb = new RFB(document.getElementById('noVNC_container'),
                          { clientToServerUrl, serverToClientUrl },

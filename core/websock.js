@@ -24,7 +24,11 @@ const MAX_RQ_GROW_SIZE = 40 * 1024 * 1024;  // 40 MiB
 
 export default class Websock {
     constructor() {
+        // TODO: remove _websocket
         this._websocket = null;  // WebSocket object
+        this._readableStreamController = null;
+        this._isOpen = false;
+        this._abortController = new AbortController();
 
         this._rQi = 0;           // Receive queue index
         this._rQlen = 0;         // Next write position in the receive queue
@@ -143,8 +147,10 @@ export default class Websock {
     // Send Queue
 
     flush() {
-        if (this._sQlen > 0 && this._websocket.readyState === WebSocket.OPEN) {
-            this._websocket.send(this._encodeMessage());
+        if (this._sQlen > 0 && this._isOpen) {
+            // Wrapping Uint8Array for shallow coping
+            const message = new Uint8Array(this._encodeMessage());
+            this._readableStreamController.enqueue(message);
             this._sQlen = 0;
         }
     }
@@ -179,43 +185,45 @@ export default class Websock {
         this._websocket = null;
     }
 
-    open(uri, protocols) {
+    open(urls, protocols) {
         this.init();
 
-        this._websocket = new WebSocket(uri, protocols);
-        this._websocket.binaryType = 'arraybuffer';
-
-        this._websocket.onmessage = this._recvMessage.bind(this);
-        this._websocket.onopen = () => {
-            Log.Debug('>> WebSock.onopen');
-            if (this._websocket.protocol) {
-                Log.Info("Server choose sub-protocol: " + this._websocket.protocol);
+        const self = this;
+        const readable = new ReadableStream({
+            start(ctrl) {
+                self._readableStreamController = ctrl;
             }
-
+        });
+        fetch(urls.clientToServerUrl, {
+            method: "POST",
+            body: readable,
+            allowHTTP1ForStreamingUpload: true,
+            signal: this._abortController.signal,
+        });
+        (async () => {
+            const getResPromise = fetch(urls.serverToClientUrl, {
+                signal: this._abortController.signal,
+            });
+            const getRes = await getResPromise;
+            this._isOpen = true;
+            Log.Debug('>> Open');
             this._eventHandlers.open();
-            Log.Debug("<< WebSock.onopen");
-        };
-        this._websocket.onclose = (e) => {
-            Log.Debug(">> WebSock.onclose");
-            this._eventHandlers.close(e);
-            Log.Debug("<< WebSock.onclose");
-        };
-        this._websocket.onerror = (e) => {
-            Log.Debug(">> WebSock.onerror: " + e);
-            this._eventHandlers.error(e);
-            Log.Debug("<< WebSock.onerror: " + e);
-        };
+            const reader = getRes.body.getReader();
+            reader.closed.then(() => {
+                Log.Debug(">> Closed");
+            });
+            while (true) {
+                const {value, done} = await reader.read();
+                if (done) break;
+                this._recvMessage(value);
+            }
+        })();
     }
 
     close() {
-        if (this._websocket) {
-            if ((this._websocket.readyState === WebSocket.OPEN) ||
-                    (this._websocket.readyState === WebSocket.CONNECTING)) {
-                Log.Info("Closing WebSocket connection");
-                this._websocket.close();
-            }
-
-            this._websocket.onmessage = () => {};
+        if (this._abortController.signal) {
+            Log.Info("Closing HTTPS connection over Piping Server");
+            this._abortController.abort();
         }
     }
 
@@ -230,7 +238,7 @@ export default class Websock {
     // e.g. compacting.
     // The function also expands the receive que if needed, and for
     // performance reasons we combine these two actions to avoid
-    // unneccessary copying.
+    // unnecessary copying.
     _expandCompactRQ(minFit) {
         // if we're using less than 1/8th of the buffer even with the incoming bytes, compact in place
         // instead of resizing
@@ -268,8 +276,7 @@ export default class Websock {
     }
 
     // push arraybuffer values onto the end of the receive que
-    _DecodeMessage(data) {
-        const u8 = new Uint8Array(data);
+    _DecodeMessage(u8) {
         if (u8.length > this._rQbufferSize - this._rQlen) {
             this._expandCompactRQ(u8.length);
         }
@@ -277,8 +284,8 @@ export default class Websock {
         this._rQlen += u8.length;
     }
 
-    _recvMessage(e) {
-        this._DecodeMessage(e.data);
+    _recvMessage(u8) {
+        this._DecodeMessage(u8);
         if (this.rQlen > 0) {
             this._eventHandlers.message();
             if (this._rQlen == this._rQi) {

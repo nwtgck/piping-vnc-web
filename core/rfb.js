@@ -69,18 +69,18 @@ const extendedClipboardActionProvide = 1 << 28;
 
 
 export default class RFB extends EventTargetMixin {
-    constructor(target, url, options) {
+    constructor(target, urls, options) {
         if (!target) {
             throw new Error("Must specify target");
         }
-        if (!url) {
-            throw new Error("Must specify URL");
+        if (!urls) {
+            throw new Error("Must specify URLs");
         }
 
         super();
 
         this._target = target;
-        this._url = url;
+        this._urls = urls;
 
         // Connection details
         options = options || {};
@@ -504,11 +504,11 @@ export default class RFB extends EventTargetMixin {
     _connect() {
         Log.Debug(">> RFB.connect");
 
-        Log.Info("connecting to " + this._url);
+        Log.Info("connecting to " + JSON.stringify(this._urls));
 
         try {
             // WebSocket.onopen transitions to the RFB init states
-            this._sock.open(this._url, this._wsProtocols);
+            this._sock.open(this._urls, this._wsProtocols);
         } catch (e) {
             if (e.name === 'SyntaxError') {
                 this._fail("Invalid host or port (" + e + ")");

@@ -17,7 +17,32 @@ import Keyboard from "../core/input/keyboard.js";
 import RFB from "../core/rfb.js";
 import * as WebUtil from "./webutil.js";
 
-const PAGE_TITLE = "noVNC";
+const PAGE_TITLE = "Piping VNC";
+
+function randomString(len) {
+    const nonConfusingChars = ["a", "b", "c", "d", "e", "f", "h", "i", "j", "k", "m", "n", "p", "r", "s", "t", "u", "v", "w", "x", "y", "z", "2", "3", "4", "5", "6", "7", "8"];
+    const randomArr = window.crypto.getRandomValues(new Uint32Array(len));
+    return Array.from(randomArr).map(n => nonConfusingChars[n % nonConfusingChars.length]).join('');
+}
+
+function createCommandHint() {
+    const pipingServerUrl = document.getElementById('piping_server_input').value;
+    const path1 = document.getElementById('path1_input').value;
+    const path2 = document.getElementById('path2_input').value;
+
+    if (path1 === '' || path2 === '') return;
+
+    const escapedPipingServerUrl = pipingServerUrl.replace(/:/g, '\\:').replace(/\/$/, '');
+
+    const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`;
+
+    return socatCommand;
+}
+
+function setCommandHint() {
+    const hintTextarea = document.getElementById('server_host_command_hint_textarea');
+    hintTextarea.value = createCommandHint();
+}
 
 const UI = {
 
@@ -170,6 +195,26 @@ const UI = {
         UI.initSetting('repeaterID', '');
         UI.initSetting('reconnect', false);
         UI.initSetting('reconnect_delay', 5000);
+
+        // (base: https://web.dev/fetch-upload-streaming/#feature-detection)
+        const supportsRequestStreams = !new Request('', {
+            body: new ReadableStream(),
+            method: 'POST',
+        }).headers.has('Content-Type');
+
+        // If not support fetch() upload streaming
+        if (!supportsRequestStreams) {
+            // Hide login card
+            document.getElementById('input_form').style.display = "none";
+            // Show message
+            document.getElementById('not_supported_message').style.display = null;
+        }
+
+        const clientToServerPathInput = document.getElementById('path1_input');
+        const serverToClientPathInput = document.getElementById('path2_input');
+        clientToServerPathInput.value = randomString(3);
+        serverToClientPathInput.value = randomString(3);
+        setCommandHint();
 
         UI.setupSettingLabels();
     },
@@ -390,10 +435,13 @@ const UI = {
         switch (state) {
             case 'init':
                 break;
-            case 'connecting':
-                transitionElem.textContent = _("Connecting...");
+            case 'connecting': {
+                const commandHint = createCommandHint();
+                transitionElem.innerHTML = _("Connecting...") + `<br><span style="font-size: 0.8em;">Command hint:<br>${commandHint}</span>`;
+                // transitionElem.textContent = _("Connecting...");
                 document.documentElement.classList.add("noVNC_connecting");
                 break;
+            }
             case 'connected':
                 document.documentElement.classList.add("noVNC_connected");
                 break;
@@ -1023,7 +1071,16 @@ const UI = {
         }
         url += '/' + path;
 
-        UI.rfb = new RFB(document.getElementById('noVNC_container'), url,
+        const pipingServerInput = document.getElementById('piping_server_input');
+        const clientToServerPathInput = document.getElementById('path1_input');
+        const serverToClientPathInput = document.getElementById('path2_input');
+
+        const pipingServerUrl = pipingServerInput.value.replace(/\/$/, '');
+        const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
+        const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
+
+        UI.rfb = new RFB(document.getElementById('noVNC_container'),
+                         { clientToServerUrl, serverToClientUrl },
                          { shared: UI.getSetting('shared'),
                            repeaterID: UI.getSetting('repeaterID'),
                            credentials: { password: password } });
@@ -1173,6 +1230,8 @@ const UI = {
         }
         document.getElementById('noVNC_credentials_dlg')
             .classList.add('noVNC_open');
+        // Remove command hint
+        document.getElementById("noVNC_transition_text").innerText = '';
 
         setTimeout(() => document
             .getElementById(inputFocus).focus(), 100);

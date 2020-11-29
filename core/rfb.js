@@ -88,6 +88,7 @@ export default class RFB extends EventTargetMixin {
         this._shared = 'shared' in options ? !!options.shared : true;
         this._repeaterID = options.repeaterID || '';
         this._wsProtocols = options.wsProtocols || [];
+        this._keepAliveIntervalMillis = options.keepAliveIntervalMillis;
 
         // Internal state
         this._rfbConnectionState = '';
@@ -775,6 +776,14 @@ export default class RFB extends EventTargetMixin {
 
             case 'connected':
                 this.dispatchEvent(new CustomEvent("connect", { detail: {} }));
+                if (this._keepAliveIntervalMillis !== undefined) {
+                    // Set to send keep-alive signal
+                    setInterval(() => {
+                        Log.Debug(">> Send keep-alive signal");
+                        RFB.messages.fbUpdateRequest(this._sock, false, 0, 0, 1, 1);
+                        Log.Debug("<< Send keep-alive signal");
+                    }, this._keepAliveIntervalMillis);
+                }
                 break;
 
             case 'disconnecting':

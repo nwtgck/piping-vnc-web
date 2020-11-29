@@ -1086,7 +1086,9 @@ const UI = {
                          { clientToServerUrl, serverToClientUrl },
                          { shared: UI.getSetting('shared'),
                            repeaterID: UI.getSetting('repeaterID'),
-                           credentials: { password: password } });
+                           credentials: { password: password },
+                           // TODO: hard code keep-alive
+                           keepAliveIntervalMillis: 30 * 1000 });
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
         UI.rfb.addEventListener("credentialsrequired", UI.credentials);

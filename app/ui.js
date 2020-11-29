@@ -41,7 +41,7 @@ function createCommandHint() {
 
 function setCommandHint() {
     const hintTextarea = document.getElementById('server_host_command_hint_textarea');
-    hintTextarea.value = createCommandHint();
+    hintTextarea.value = createCommandHint() || '';
 }
 
 const UI = {
@@ -214,6 +214,9 @@ const UI = {
         const serverToClientPathInput = document.getElementById('path2_input');
         clientToServerPathInput.value = randomString(3);
         serverToClientPathInput.value = randomString(3);
+        document.getElementById('piping_server_input').addEventListener('input', setCommandHint);
+        clientToServerPathInput.addEventListener('input', setCommandHint);
+        serverToClientPathInput.addEventListener('input', setCommandHint);
         setCommandHint();
 
         UI.setupSettingLabels();

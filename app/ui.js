@@ -1072,6 +1072,7 @@ const UI = {
         if (port) {
             url += ':' + port;
         }
+        // eslint-disable-next-line no-unused-vars
         url += '/' + path;
 
         const pipingServerInput = document.getElementById('piping_server_input');

@@ -13,7 +13,11 @@ chrome://flags/ > Experimental Web Platform features > Enabled
 ## Acknowledgements
 This project is highly based on [noVNC]. Thanks to the original authors!
 
-## Features powered by [noVNC]
+## Features
+* Transfer data over pure HTTP/HTTPS
+* End-to-end encryption using the same way as OpenSSL AES CTR does
+
+### Features powered by [noVNC]
 
 * Supported VNC encodings: raw, copyrect, rre, hextile, tight, tightPNG
 * Supports scaling, clipping and resizing the desktop
@@ -28,6 +32,9 @@ This project is highly based on [noVNC]. Thanks to the original authors!
 
 ```bash
 cd <this repo>
+git submodule update --init --recursive # (once)
+npm ci # (once)
+npm run build-openssl-aes-ctr-stream # (once)
 python3 -m http.server
 ```
 

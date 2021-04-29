@@ -1,0 +1,3 @@
+[submodule "vendor/openssl-aes-ctr-stream-npm"]
+	path = vendor/openssl-aes-ctr-stream-npm
+	url = git@github.com:nwtgck/openssl-aes-ctr-stream-npm.git

@@ -29,13 +29,15 @@ function createCommandHint() {
     const pipingServerUrl = document.getElementById('piping_server_input').value;
     const path1 = document.getElementById('path1_input').value;
     const path2 = document.getElementById('path2_input').value;
+    const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
+    const opensslAesPassword = document.getElementById('openssl_aes_password').value;
 
     if (path1 === '' || path2 === '') return;
 
-    const escapedPipingServerUrl = pipingServerUrl.replace(/:/g, '\\:').replace(/\/$/, '');
-
-    const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`;
-
+    let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5901 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    if (opensslAesCtrEncrypts) {
+        socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    }
     return socatCommand;
 }
 
@@ -212,11 +214,31 @@ const UI = {
 
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
+        const opensslAesCtrEncryptionInput = document.getElementById('openssl_aes_ctr_encryption');
+        const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
+        const serverHostCommandHintViewButton = document.getElementById('server_host_command_hint_view_button');
+        const serverHostCommandHintTextarea = document.getElementById('server_host_command_hint_textarea');
         clientToServerPathInput.value = randomString(3);
         serverToClientPathInput.value = randomString(3);
         document.getElementById('piping_server_input').addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
+        opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
+            const opensslAesPasswordSection = document.getElementById('openssl_aes_password_td');
+            if (e.target.checked) {
+                opensslAesPasswordSection.style.display = '';
+                // Hide command hint because the hint includes password
+                serverHostCommandHintTextarea.style.display = 'none';
+            } else {
+                opensslAesPasswordSection.style.display = 'none';
+                serverHostCommandHintTextarea.style.display = '';
+            }
+            setCommandHint();
+        });
+        opensslAesPasswordInput.addEventListener('input', setCommandHint);
+        serverHostCommandHintViewButton.addEventListener('click', () => {
+            serverHostCommandHintTextarea.style.display = serverHostCommandHintTextarea.style.display === 'none' ? '' : 'none';
+        });
         setCommandHint();
 
         UI.setupSettingLabels();
@@ -439,9 +461,7 @@ const UI = {
             case 'init':
                 break;
             case 'connecting': {
-                const commandHint = createCommandHint();
-                transitionElem.innerHTML = _("Connecting...") + `<br><span style="font-size: 0.8em;">Command hint:<br>${commandHint}</span>`;
-                // transitionElem.textContent = _("Connecting...");
+                transitionElem.textContent = _("Connecting...");
                 document.documentElement.classList.add("noVNC_connecting");
                 break;
             }
@@ -494,8 +514,14 @@ const UI = {
             .classList.remove('noVNC_open');
     },
 
-    showStatus(text, statusType, time) {
+    showStatus(text, statusType, time, backgroundColor) {
         const statusElem = document.getElementById('noVNC_status');
+
+        if (backgroundColor) {
+            statusElem.style.background = backgroundColor;
+        } else {
+            statusElem.style.background = '';
+        }
 
         if (typeof statusType === 'undefined') {
             statusType = 'normal';
@@ -1078,10 +1104,23 @@ const UI = {
         const pipingServerInput = document.getElementById('piping_server_input');
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
+        const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
+        const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
 
         const pipingServerUrl = pipingServerInput.value.replace(/\/$/, '');
         const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
         const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
+
+        let opensslAesCtrDecryptPbkdf2Options = undefined;
+        if (opensslAesCtrEncrypts) {
+            opensslAesCtrDecryptPbkdf2Options = {
+                // TODO: hard code parameters
+                keyBits: 256,
+                password: opensslAesPasswordInput.value,
+                iterations: 100000,
+                hash: "SHA-256"
+            };
+        }
 
         UI.rfb = new RFB(document.getElementById('noVNC_container'),
                          { clientToServerUrl, serverToClientUrl },
@@ -1089,7 +1128,9 @@ const UI = {
                            repeaterID: UI.getSetting('repeaterID'),
                            credentials: { password: password },
                            // TODO: hard code keep-alive
-                           keepAliveIntervalMillis: 30 * 1000 });
+                           keepAliveIntervalMillis: 30 * 1000,
+                           opensslAesCtrDecryptPbkdf2Options
+                         });
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
         UI.rfb.addEventListener("credentialsrequired", UI.credentials);
@@ -1148,13 +1189,22 @@ const UI = {
         UI.connected = true;
         UI.inhibitReconnect = false;
 
+        const pipingServerUrl = document.getElementById('piping_server_input').value;
+        const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
+
+        // NOTE: UI.getSetting('encrypt') means wss/ws in original noVNC (ref: https://github.com/novnc/noVNC/blob/60c7518f8c32704615b4953bae28783786817cdc/app/ui.js#L1018)
         let msg;
-        if (UI.getSetting('encrypt')) {
+        let statusBackgroundColor = undefined;
+        if (opensslAesCtrEncrypts) {
+            msg = _("Connected (end-to-end encrypted) to ") + UI.desktopName;
+            statusBackgroundColor = '#3366ff';
+        } else if (pipingServerUrl.startsWith("https://")) {
             msg = _("Connected (encrypted) to ") + UI.desktopName;
+            statusBackgroundColor = '#5BA42C';
         } else {
             msg = _("Connected (unencrypted) to ") + UI.desktopName;
         }
-        UI.showStatus(msg);
+        UI.showStatus(msg, undefined, undefined, statusBackgroundColor);
         UI.updateVisualState('connected');
 
         // Do this last because it can only be used on rendered elements

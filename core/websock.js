@@ -14,6 +14,8 @@
 
 import * as Log from './util/logging.js';
 
+const opensslAesCtrStream = window.opensslAesCtrStream;
+
 // this has performance issues in some versions Chromium, and
 // doesn't gain a tremendous amount of performance increase in Firefox
 // at the moment.  It may be valuable to turn it on in the future.
@@ -23,12 +25,16 @@ const ENABLE_COPYWITHIN = false;
 const MAX_RQ_GROW_SIZE = 40 * 1024 * 1024;  // 40 MiB
 
 export default class Websock {
-    constructor() {
+    /**
+     * @param opensslAesCtrDecryptPbkdf2Options can be undefined
+     */
+    constructor(opensslAesCtrDecryptPbkdf2Options) {
         // TODO: remove _websocket
         this._websocket = null;  // WebSocket object
         this._readableStreamController = null;
         this._isOpen = false;
         this._abortController = new AbortController();
+        this._opensslAesCtrDecryptPbkdf2Options = opensslAesCtrDecryptPbkdf2Options;
 
         this._rQi = 0;           // Receive queue index
         this._rQlen = 0;         // Next write position in the receive queue
@@ -189,14 +195,17 @@ export default class Websock {
         this.init();
 
         const self = this;
-        const readable = new ReadableStream({
+        let uploadReadableStream = new ReadableStream({
             start(ctrl) {
                 self._readableStreamController = ctrl;
             }
         });
+        if (this._opensslAesCtrDecryptPbkdf2Options !== undefined) {
+            uploadReadableStream = opensslAesCtrStream.aesCtrEncryptWithPbkdf2(uploadReadableStream, this._opensslAesCtrDecryptPbkdf2Options);
+        }
         fetch(urls.clientToServerUrl, {
             method: "POST",
-            body: readable,
+            body: uploadReadableStream,
             allowHTTP1ForStreamingUpload: true,
             signal: this._abortController.signal,
         });
@@ -208,7 +217,12 @@ export default class Websock {
             this._isOpen = true;
             Log.Debug('>> Open');
             this._eventHandlers.open();
-            const reader = getRes.body.getReader();
+
+            let downloadReadableStream = getRes.body;
+            if (this._opensslAesCtrDecryptPbkdf2Options !== undefined) {
+                downloadReadableStream = opensslAesCtrStream.aesCtrDecryptWithPbkdf2(downloadReadableStream, this._opensslAesCtrDecryptPbkdf2Options);
+            }
+            const reader = downloadReadableStream.getReader();
             reader.closed.then(() => {
                 Log.Debug(">> Closed");
             });

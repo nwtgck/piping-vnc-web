@@ -25,20 +25,20 @@ function randomString(len) {
     return Array.from(randomArr).map(n => nonConfusingChars[n % nonConfusingChars.length]).join('');
 }
 
-// TODO: hard code
-const password = "v3jiykKAeeSk2XZHwaaZ";
-
 function createCommandHint() {
     const pipingServerUrl = document.getElementById('piping_server_input').value;
     const path1 = document.getElementById('path1_input').value;
     const path2 = document.getElementById('path2_input').value;
+    const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
+    const opensslAesPassword = document.getElementById('openssl_aes_password').value;
 
     if (path1 === '' || path2 === '') return;
 
-    // const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`;
-    // const socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5900 | curl -sSNT - ${pipingServerUrl}/${path2}`;
-    const socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${password}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${password}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | curl -sSNT - ${pipingServerUrl}/${path2}`;
-
+    let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5900 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    if (opensslAesCtrEncrypts) {
+        // TODO: 5901 port
+        socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    }
     return socatCommand;
 }
 
@@ -215,11 +215,19 @@ const UI = {
 
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
+        const opensslAesCtrEncryptionInput = document.getElementById('openssl_aes_ctr_encryption');
+        const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
         clientToServerPathInput.value = randomString(3);
         serverToClientPathInput.value = randomString(3);
         document.getElementById('piping_server_input').addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
+        opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
+            const tr = document.getElementById('openssl_aes_password_td');
+            tr.style.display = e.target.checked ? '' : 'none';
+            setCommandHint();
+        });
+        opensslAesPasswordInput.addEventListener('input', setCommandHint);
         setCommandHint();
 
         UI.setupSettingLabels();
@@ -1081,13 +1089,12 @@ const UI = {
         const pipingServerInput = document.getElementById('piping_server_input');
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
+        const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
 
         const pipingServerUrl = pipingServerInput.value.replace(/\/$/, '');
         const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
         const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
 
-        // TODO: hard code
-        const opensslAesPassword = "v3jiykKAeeSk2XZHwaaZ";
         UI.rfb = new RFB(document.getElementById('noVNC_container'),
                          { clientToServerUrl, serverToClientUrl },
                          { shared: UI.getSetting('shared'),
@@ -1098,7 +1105,7 @@ const UI = {
                            opensslAesCtrDecryptPbkdf2Options: {
                                // TODO: hard code parameters
                                keyBits: 256,
-                               password: opensslAesPassword,
+                               password: opensslAesPasswordInput.value,
                                iterations: 100000,
                                hash: "SHA-256"
                            }

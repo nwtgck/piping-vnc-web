@@ -17,6 +17,7 @@ import Keyboard from "../core/input/keyboard.js";
 import RFB from "../core/rfb.js";
 import * as WebUtil from "./webutil.js";
 
+const opensslAesCtrStream = window.opensslAesCtrStream;
 const PAGE_TITLE = "Piping VNC";
 
 function randomString(len) {
@@ -25,16 +26,21 @@ function randomString(len) {
     return Array.from(randomArr).map(n => nonConfusingChars[n % nonConfusingChars.length]).join('');
 }
 
+// TODO: hard code
+const password = "v3jiykKAeeSk2XZHwaaZ";
+
 function createCommandHint() {
+    console.log("aesCtrDecrypt", opensslAesCtrStream);
+
     const pipingServerUrl = document.getElementById('piping_server_input').value;
     const path1 = document.getElementById('path1_input').value;
     const path2 = document.getElementById('path2_input').value;
 
     if (path1 === '' || path2 === '') return;
 
-    const escapedPipingServerUrl = pipingServerUrl.replace(/:/g, '\\:').replace(/\/$/, '');
-
-    const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`;
+    // const socatCommand = `socat 'EXEC:curl -NsS ${escapedPipingServerUrl}/${path1}!!EXEC:curl -NsST - ${escapedPipingServerUrl}/${path2}' TCP:127.0.0.1:5900`;
+    // const socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5900 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    const socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${password}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${password}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | curl -sSNT - ${pipingServerUrl}/${path2}`;
 
     return socatCommand;
 }

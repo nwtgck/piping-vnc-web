@@ -8,6 +8,11 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: npm ci
+      - name: Build openssl-aes-ctr-stream
+        run: npm run build-openssl-aes-ctr-stream
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.1
         with:

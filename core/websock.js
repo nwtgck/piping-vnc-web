@@ -14,6 +14,8 @@
 
 import * as Log from './util/logging.js';
 
+const opensslAesCtrStream = window.opensslAesCtrStream;
+
 // this has performance issues in some versions Chromium, and
 // doesn't gain a tremendous amount of performance increase in Firefox
 // at the moment.  It may be valuable to turn it on in the future.
@@ -21,6 +23,9 @@ import * as Log from './util/logging.js';
 // Safari 13 (at the moment we want to support Safari 11).
 const ENABLE_COPYWITHIN = false;
 const MAX_RQ_GROW_SIZE = 40 * 1024 * 1024;  // 40 MiB
+
+// TODO: hard code
+const password = "v3jiykKAeeSk2XZHwaaZ";
 
 export default class Websock {
     constructor() {
@@ -189,11 +194,21 @@ export default class Websock {
         this.init();
 
         const self = this;
-        const readable = new ReadableStream({
+        let readable = new ReadableStream({
             start(ctrl) {
                 self._readableStreamController = ctrl;
             }
         });
+        console.log('here111');
+        // TODO: use condition
+        readable = opensslAesCtrStream.aesCtrEncryptWithPbkdf2(readable, {
+            // TODO: hard code parameters
+            keyBits: 256,
+            password: password,
+            iterations: 100000,
+            hash: "SHA-256"
+        });
+        console.log('readable', readable);
         fetch(urls.clientToServerUrl, {
             method: "POST",
             body: readable,
@@ -208,7 +223,17 @@ export default class Websock {
             this._isOpen = true;
             Log.Debug('>> Open');
             this._eventHandlers.open();
-            const reader = getRes.body.getReader();
+
+            // TODO: use condition
+            const downloadReadableStream = opensslAesCtrStream.aesCtrDecryptWithPbkdf2(getRes.body, {
+                // TODO: hard code parameters
+                keyBits: 256,
+                password: password,
+                iterations: 100000,
+                hash: "SHA-256"
+            });
+            console.log('downloadReadableStream', downloadReadableStream);
+            const reader = downloadReadableStream.getReader();
             reader.closed.then(() => {
                 Log.Debug(">> Closed");
             });

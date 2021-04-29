@@ -516,8 +516,14 @@ const UI = {
             .classList.remove('noVNC_open');
     },
 
-    showStatus(text, statusType, time) {
+    showStatus(text, statusType, time, backgroundColor) {
         const statusElem = document.getElementById('noVNC_status');
+
+        if (backgroundColor) {
+            statusElem.style.background = backgroundColor;
+        } else {
+            statusElem.style.background = '';
+        }
 
         if (typeof statusType === 'undefined') {
             statusType = 'normal';
@@ -1190,14 +1196,17 @@ const UI = {
 
         // NOTE: UI.getSetting('encrypt') means wss/ws in original noVNC (ref: https://github.com/novnc/noVNC/blob/60c7518f8c32704615b4953bae28783786817cdc/app/ui.js#L1018)
         let msg;
+        let statusBackgroundColor = undefined;
         if (opensslAesCtrEncrypts) {
             msg = _("Connected (end-to-end encrypted) to ") + UI.desktopName;
+            statusBackgroundColor = '#3366ff';
         } else if (pipingServerUrl.startsWith("https://")) {
             msg = _("Connected (encrypted) to ") + UI.desktopName;
+            statusBackgroundColor = '#5BA42C';
         } else {
             msg = _("Connected (unencrypted) to ") + UI.desktopName;
         }
-        UI.showStatus(msg);
+        UI.showStatus(msg, undefined, undefined, statusBackgroundColor);
         UI.updateVisualState('connected');
 
         // Do this last because it can only be used on rendered elements

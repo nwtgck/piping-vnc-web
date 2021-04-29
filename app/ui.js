@@ -1101,10 +1101,22 @@ const UI = {
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
         const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
+        const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
 
         const pipingServerUrl = pipingServerInput.value.replace(/\/$/, '');
         const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
         const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
+
+        let opensslAesCtrDecryptPbkdf2Options = undefined;
+        if (opensslAesCtrEncrypts) {
+            opensslAesCtrDecryptPbkdf2Options = {
+                // TODO: hard code parameters
+                keyBits: 256,
+                password: opensslAesPasswordInput.value,
+                iterations: 100000,
+                hash: "SHA-256"
+            };
+        }
 
         UI.rfb = new RFB(document.getElementById('noVNC_container'),
                          { clientToServerUrl, serverToClientUrl },
@@ -1113,13 +1125,7 @@ const UI = {
                            credentials: { password: password },
                            // TODO: hard code keep-alive
                            keepAliveIntervalMillis: 30 * 1000,
-                           opensslAesCtrDecryptPbkdf2Options: {
-                               // TODO: hard code parameters
-                               keyBits: 256,
-                               password: opensslAesPasswordInput.value,
-                               iterations: 100000,
-                               hash: "SHA-256"
-                           }
+                           opensslAesCtrDecryptPbkdf2Options
                          });
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);

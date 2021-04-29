@@ -34,9 +34,8 @@ function createCommandHint() {
 
     if (path1 === '' || path2 === '') return;
 
-    let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5900 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5901 | curl -sSNT - ${pipingServerUrl}/${path2}`;
     if (opensslAesCtrEncrypts) {
-        // TODO: 5901 port
         socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | curl -sSNT - ${pipingServerUrl}/${path2}`;
     }
     return socatCommand;
@@ -217,17 +216,29 @@ const UI = {
         const serverToClientPathInput = document.getElementById('path2_input');
         const opensslAesCtrEncryptionInput = document.getElementById('openssl_aes_ctr_encryption');
         const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
+        const serverHostCommandHintViewButton = document.getElementById('server_host_command_hint_view_button');
+        const serverHostCommandHintTextarea = document.getElementById('server_host_command_hint_textarea');
         clientToServerPathInput.value = randomString(3);
         serverToClientPathInput.value = randomString(3);
         document.getElementById('piping_server_input').addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
         opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
-            const tr = document.getElementById('openssl_aes_password_td');
-            tr.style.display = e.target.checked ? '' : 'none';
+            const opensslAesPasswordSection = document.getElementById('openssl_aes_password_td');
+            if (e.target.checked) {
+                opensslAesPasswordSection.style.display = '';
+                // Hide command hint because the hint includes password
+                serverHostCommandHintTextarea.style.display = 'none';
+            } else {
+                opensslAesPasswordSection.style.display = 'none';
+                serverHostCommandHintTextarea.style.display = '';
+            }
             setCommandHint();
         });
         opensslAesPasswordInput.addEventListener('input', setCommandHint);
+        serverHostCommandHintViewButton.addEventListener('click', () => {
+            serverHostCommandHintTextarea.style.display = serverHostCommandHintTextarea.style.display === 'none' ? '' : 'none';
+        });
         setCommandHint();
 
         UI.setupSettingLabels();

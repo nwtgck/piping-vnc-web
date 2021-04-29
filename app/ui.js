@@ -17,7 +17,6 @@ import Keyboard from "../core/input/keyboard.js";
 import RFB from "../core/rfb.js";
 import * as WebUtil from "./webutil.js";
 
-const opensslAesCtrStream = window.opensslAesCtrStream;
 const PAGE_TITLE = "Piping VNC";
 
 function randomString(len) {
@@ -30,8 +29,6 @@ function randomString(len) {
 const password = "v3jiykKAeeSk2XZHwaaZ";
 
 function createCommandHint() {
-    console.log("aesCtrDecrypt", opensslAesCtrStream);
-
     const pipingServerUrl = document.getElementById('piping_server_input').value;
     const path1 = document.getElementById('path1_input').value;
     const path2 = document.getElementById('path2_input').value;
@@ -1089,13 +1086,23 @@ const UI = {
         const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
         const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
 
+        // TODO: hard code
+        const opensslAesPassword = "v3jiykKAeeSk2XZHwaaZ";
         UI.rfb = new RFB(document.getElementById('noVNC_container'),
                          { clientToServerUrl, serverToClientUrl },
                          { shared: UI.getSetting('shared'),
                            repeaterID: UI.getSetting('repeaterID'),
                            credentials: { password: password },
                            // TODO: hard code keep-alive
-                           keepAliveIntervalMillis: 30 * 1000 });
+                           keepAliveIntervalMillis: 30 * 1000,
+                           opensslAesCtrDecryptPbkdf2Options: {
+                               // TODO: hard code parameters
+                               keyBits: 256,
+                               password: opensslAesPassword,
+                               iterations: 100000,
+                               hash: "SHA-256"
+                           }
+                         });
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
         UI.rfb.addEventListener("credentialsrequired", UI.credentials);

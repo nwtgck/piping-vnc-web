@@ -89,6 +89,7 @@ export default class RFB extends EventTargetMixin {
         this._repeaterID = options.repeaterID || '';
         this._wsProtocols = options.wsProtocols || [];
         this._keepAliveIntervalMillis = options.keepAliveIntervalMillis;
+        this._opensslAesCtrDecryptPbkdf2Options = options.opensslAesCtrDecryptPbkdf2Options;
 
         // Internal state
         this._rfbConnectionState = '';
@@ -232,7 +233,7 @@ export default class RFB extends EventTargetMixin {
 
         this._gestures = new GestureHandler();
 
-        this._sock = new Websock();
+        this._sock = new Websock(this._opensslAesCtrDecryptPbkdf2Options);
         this._sock.on('message', () => {
             this._handleMessage();
         });

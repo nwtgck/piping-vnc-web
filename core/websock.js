@@ -24,16 +24,17 @@ const opensslAesCtrStream = window.opensslAesCtrStream;
 const ENABLE_COPYWITHIN = false;
 const MAX_RQ_GROW_SIZE = 40 * 1024 * 1024;  // 40 MiB
 
-// TODO: hard code
-const password = "v3jiykKAeeSk2XZHwaaZ";
-
 export default class Websock {
-    constructor() {
+    /**
+     * @param opensslAesCtrDecryptPbkdf2Options can be undefined
+     */
+    constructor(opensslAesCtrDecryptPbkdf2Options) {
         // TODO: remove _websocket
         this._websocket = null;  // WebSocket object
         this._readableStreamController = null;
         this._isOpen = false;
         this._abortController = new AbortController();
+        this._opensslAesCtrDecryptPbkdf2Options = opensslAesCtrDecryptPbkdf2Options;
 
         this._rQi = 0;           // Receive queue index
         this._rQlen = 0;         // Next write position in the receive queue
@@ -194,24 +195,17 @@ export default class Websock {
         this.init();
 
         const self = this;
-        let readable = new ReadableStream({
+        let uploadReadableStream = new ReadableStream({
             start(ctrl) {
                 self._readableStreamController = ctrl;
             }
         });
-        console.log('here111');
-        // TODO: use condition
-        readable = opensslAesCtrStream.aesCtrEncryptWithPbkdf2(readable, {
-            // TODO: hard code parameters
-            keyBits: 256,
-            password: password,
-            iterations: 100000,
-            hash: "SHA-256"
-        });
-        console.log('readable', readable);
+        if (this._opensslAesCtrDecryptPbkdf2Options !== undefined) {
+            uploadReadableStream = opensslAesCtrStream.aesCtrEncryptWithPbkdf2(uploadReadableStream, this._opensslAesCtrDecryptPbkdf2Options);
+        }
         fetch(urls.clientToServerUrl, {
             method: "POST",
-            body: readable,
+            body: uploadReadableStream,
             allowHTTP1ForStreamingUpload: true,
             signal: this._abortController.signal,
         });
@@ -224,15 +218,10 @@ export default class Websock {
             Log.Debug('>> Open');
             this._eventHandlers.open();
 
-            // TODO: use condition
-            const downloadReadableStream = opensslAesCtrStream.aesCtrDecryptWithPbkdf2(getRes.body, {
-                // TODO: hard code parameters
-                keyBits: 256,
-                password: password,
-                iterations: 100000,
-                hash: "SHA-256"
-            });
-            console.log('downloadReadableStream', downloadReadableStream);
+            let downloadReadableStream = getRes.body;
+            if (this._opensslAesCtrDecryptPbkdf2Options !== undefined) {
+                downloadReadableStream = opensslAesCtrStream.aesCtrDecryptWithPbkdf2(downloadReadableStream, this._opensslAesCtrDecryptPbkdf2Options);
+            }
             const reader = downloadReadableStream.getReader();
             reader.closed.then(() => {
                 Log.Debug(">> Closed");

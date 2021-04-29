@@ -1179,8 +1179,14 @@ const UI = {
         UI.connected = true;
         UI.inhibitReconnect = false;
 
+        const pipingServerUrl = document.getElementById('piping_server_input').value;
+        const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
+
+        // NOTE: UI.getSetting('encrypt') means wss/ws in original noVNC (ref: https://github.com/novnc/noVNC/blob/60c7518f8c32704615b4953bae28783786817cdc/app/ui.js#L1018)
         let msg;
-        if (UI.getSetting('encrypt')) {
+        if (opensslAesCtrEncrypts) {
+            msg = _("Connected (end-to-end encrypted) to ") + UI.desktopName;
+        } else if (pipingServerUrl.startsWith("https://")) {
             msg = _("Connected (encrypted) to ") + UI.desktopName;
         } else {
             msg = _("Connected (unencrypted) to ") + UI.desktopName;

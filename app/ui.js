@@ -461,9 +461,7 @@ const UI = {
             case 'init':
                 break;
             case 'connecting': {
-                const commandHint = createCommandHint();
-                transitionElem.innerHTML = _("Connecting...") + `<br><span style="font-size: 0.8em;">Command hint:<br>${commandHint}</span>`;
-                // transitionElem.textContent = _("Connecting...");
+                transitionElem.textContent = _("Connecting...");
                 document.documentElement.classList.add("noVNC_connecting");
                 break;
             }

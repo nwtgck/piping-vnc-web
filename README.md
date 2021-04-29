@@ -28,6 +28,9 @@ This project is highly based on [noVNC]. Thanks to the original authors!
 
 ```bash
 cd <this repo>
+git submodule update --init --recursive # (once)
+npm ci # (once)
+npm run build-openssl-aes-ctr-stream # (once)
 python3 -m http.server
 ```
 

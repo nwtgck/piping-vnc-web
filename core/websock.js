@@ -26,14 +26,16 @@ const MAX_RQ_GROW_SIZE = 40 * 1024 * 1024;  // 40 MiB
 
 export default class Websock {
     /**
+     * @param pipingServerHeaders can be undefined
      * @param opensslAesCtrDecryptPbkdf2Options can be undefined
      */
-    constructor(opensslAesCtrDecryptPbkdf2Options) {
+    constructor(pipingServerHeaders, opensslAesCtrDecryptPbkdf2Options) {
         // TODO: remove _websocket
         this._websocket = null;  // WebSocket object
         this._readableStreamController = null;
         this._isOpen = false;
         this._abortController = new AbortController();
+        this._pipingServerHeaders = pipingServerHeaders;
         this._opensslAesCtrDecryptPbkdf2Options = opensslAesCtrDecryptPbkdf2Options;
 
         this._rQi = 0;           // Receive queue index
@@ -206,11 +208,13 @@ export default class Websock {
         fetch(urls.clientToServerUrl, {
             method: "POST",
             body: uploadReadableStream,
+            headers: this._pipingServerHeaders,
             allowHTTP1ForStreamingUpload: true,
             signal: this._abortController.signal,
         });
         (async () => {
             const getResPromise = fetch(urls.serverToClientUrl, {
+                headers: this._pipingServerHeaders,
                 signal: this._abortController.signal,
             });
             const getRes = await getResPromise;

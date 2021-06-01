@@ -7,10 +7,9 @@
  */
 
 import * as Log from '../core/util/logging.js';
-import _, { l10n } from './localization.js';
-import { isTouchDevice, isSafari, hasScrollbarGutter, dragThreshold }
-    from '../core/util/browser.js';
-import { setCapture, getPointerEvent } from '../core/util/events.js';
+import _, {l10n} from './localization.js';
+import {dragThreshold, hasScrollbarGutter, isSafari, isTouchDevice} from '../core/util/browser.js';
+import {getPointerEvent, setCapture} from '../core/util/events.js';
 import KeyTable from "../core/input/keysym.js";
 import keysyms from "../core/input/keysymdef.js";
 import Keyboard from "../core/input/keyboard.js";
@@ -223,9 +222,14 @@ const UI = {
         const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
         const serverHostCommandHintViewButton = document.getElementById('server_host_command_hint_view_button');
         const serverHostCommandHintTextarea = document.getElementById('server_host_command_hint_textarea');
+        const pipingServerInput = document.getElementById('piping_server_input');
         clientToServerPathInput.value = parseHashAsQuery().get('cs_path') || randomString(3);
         serverToClientPathInput.value = parseHashAsQuery().get('sc_path') || randomString(3);
-        document.getElementById('piping_server_input').addEventListener('input', setCommandHint);
+        const pipingServerUrlQuery = parseHashAsQuery().get('server');
+        if (pipingServerUrlQuery) {
+            pipingServerInput.value = decodeURIComponent(pipingServerUrlQuery);
+        }
+        pipingServerInput.addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
         opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
@@ -1116,6 +1120,13 @@ const UI = {
         const clientToServerUrl = pipingServerUrl + '/' + clientToServerPathInput.value;
         const serverToClientUrl = pipingServerUrl + '/' + serverToClientPathInput.value;
 
+        let pipingServerHeaders = undefined;
+        const pipingServerHeadersQuery = parseHashAsQuery().get('headers');
+        if (pipingServerHeadersQuery) {
+            // NOTE: type should be Array<[string, string]>
+            pipingServerHeaders = new Headers(JSON.parse(decodeURIComponent(pipingServerHeadersQuery)));
+        }
+
         let opensslAesCtrDecryptPbkdf2Options = undefined;
         if (opensslAesCtrEncrypts) {
             opensslAesCtrDecryptPbkdf2Options = {
@@ -1134,7 +1145,8 @@ const UI = {
                            credentials: { password: password },
                            // TODO: hard code keep-alive
                            keepAliveIntervalMillis: 30 * 1000,
-                           opensslAesCtrDecryptPbkdf2Options
+                           pipingServerHeaders,
+                           opensslAesCtrDecryptPbkdf2Options,
                          });
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);

@@ -46,6 +46,11 @@ function setCommandHint() {
     hintTextarea.value = createCommandHint() || '';
 }
 
+function parseHashAsQuery() {
+    const url = new URL(`a://a${location.hash.substring(1)}`);
+    return url.searchParams;
+}
+
 const UI = {
 
     connected: false,
@@ -218,8 +223,8 @@ const UI = {
         const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
         const serverHostCommandHintViewButton = document.getElementById('server_host_command_hint_view_button');
         const serverHostCommandHintTextarea = document.getElementById('server_host_command_hint_textarea');
-        clientToServerPathInput.value = randomString(3);
-        serverToClientPathInput.value = randomString(3);
+        clientToServerPathInput.value = parseHashAsQuery().get('cs_path') || randomString(3);
+        serverToClientPathInput.value = parseHashAsQuery().get('sc_path') || randomString(3);
         document.getElementById('piping_server_input').addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);

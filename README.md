@@ -28,6 +28,17 @@ This project is highly based on [noVNC]. Thanks to the original authors!
 * Licensed mainly under the [MPL 2.0](http://www.mozilla.org/MPL/2.0/), see
   [the license document](LICENSE.txt) for details
 
+## URL fragment parameters
+
+e.g. <https://piping-vnc.netlify.app/vnc.html#?cs_path=aaa&sc_path=bbb>.  
+Use `#?`, which does not send parameters to the hosting server: piping-vnc.netlify.app.
+
+* `server`: Piping Server URL
+* `cs_path`: Server-to-client path
+* `sc_path`: Client-to-server path
+* `headers`: HTTP headers to Piping Server
+  - (e.g. `[["X-MyExtra1", "myvalue1"], ["Content-Type", "application/myapp"]]`)
+
 ## Run locally
 
 ```bash

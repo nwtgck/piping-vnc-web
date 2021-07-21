@@ -2,7 +2,7 @@
 VNC over pure HTTPS via [Piping Server](https://github.com/nwtgck/piping-server)
 
 ## Application
-<https://piping-vnc.netlify.app>
+<https://piping-vnc.nwtgck.org>
 
 ## Requirements
 
@@ -30,8 +30,8 @@ This project is highly based on [noVNC]. Thanks to the original authors!
 
 ## URL fragment parameters
 
-e.g. <https://piping-vnc.netlify.app/vnc.html#?cs_path=aaa&sc_path=bbb>.  
-Use `#?`, which does not send parameters to the hosting server: piping-vnc.netlify.app.
+e.g. <https://piping-vnc.nwtgck.org/vnc.html#?cs_path=aaa&sc_path=bbb>.  
+Use `#?`, which does not send parameters to the hosting server: piping-vnc.nwtgck.org.
 
 * `server`: Piping Server URL
 * `cs_path`: Server-to-client path

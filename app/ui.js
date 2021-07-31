@@ -50,6 +50,22 @@ function parseHashAsQuery() {
     return url.searchParams;
 }
 
+// (from: https://web.dev/fetch-upload-streaming/#feature-detection)
+// (from: https://github.com/whatwg/fetch/issues/1275#issue-955832232)
+const supportsRequestStreamsPromise = (async () => {
+    const supportsStreamsInRequestObjects = !new Request('', {
+        method: 'POST',
+        body: new ReadableStream(),
+    }).headers.has('Content-Type');
+
+    if (!supportsStreamsInRequestObjects) return false;
+
+    return fetch('data:a/a;charset=utf-8,', {
+        method: 'POST',
+        body: new ReadableStream(),
+    }).then(() => true, () => false);
+})();
+
 const UI = {
 
     connected: false,
@@ -85,9 +101,9 @@ const UI = {
     },
 
     // Render default UI and initialize settings menu
-    start() {
+    async start() {
 
-        UI.initSettings();
+        await UI.initSettings();
 
         // Translate the DOM
         l10n.translateDOM();
@@ -164,7 +180,7 @@ const UI = {
         }
     },
 
-    initSettings() {
+    async initSettings() {
         // Logging selection dropdown
         const llevels = ['error', 'warn', 'info', 'debug'];
         for (let i = 0; i < llevels.length; i += 1) {
@@ -202,14 +218,8 @@ const UI = {
         UI.initSetting('reconnect', false);
         UI.initSetting('reconnect_delay', 5000);
 
-        // (base: https://web.dev/fetch-upload-streaming/#feature-detection)
-        const supportsRequestStreams = !new Request('', {
-            body: new ReadableStream(),
-            method: 'POST',
-        }).headers.has('Content-Type');
-
         // If not support fetch() upload streaming
-        if (!supportsRequestStreams) {
+        if (!(await supportsRequestStreamsPromise)) {
             // Hide login card
             document.getElementById('input_form').style.display = "none";
             // Show message

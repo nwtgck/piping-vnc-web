@@ -38,6 +38,8 @@ Use `#?`, which does not send parameters to the hosting server: piping-vnc.nwtgc
 * `sc_path`: Client-to-server path
 * `headers`: HTTP headers to Piping Server
   - (e.g. `[["X-MyExtra1", "myvalue1"], ["Content-Type", "application/myapp"]]`)
+* `e2ee`: E2E encryption option
+  - (type: `{ "cipher_type": "openssl-aes-256-ctr", "pass": string, "pbkdf2": { "iter": number, "hash": "sha1" | "sha256" | "sha512" } }`)
 
 ## Run locally
 

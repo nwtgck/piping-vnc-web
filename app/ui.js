@@ -246,10 +246,26 @@ const UI = {
         pipingServerInput.addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
-        opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
+        const e2eeRaw = parseHashAsQuery().get('e2ee');
+        if (e2eeRaw !== null) {
+            // e2ee JSON: { "cipher_type": "openssl-aes-256-ctr", "pass": string, "pbkdf2": { "iter": number, "hash": "sha1" | "sha256" | "sha512" } }
+            const e2ee = JSON.parse(e2eeRaw);
+            switch (e2ee.cipher_type) {
+                case "openssl-aes-256-ctr":
+                    opensslAesCtrEncryptionInput.checked = true;
+                    break;
+                default:
+                    throw new Error(`unexpected cipher type: ${e2ee.cipher_type}`);
+            }
+            opensslAesPasswordInput.value = e2ee.pass;
+            pbkdf2IterInput.value = e2ee.pbkdf2.iter;
+            pbkdf2HashInput.value = e2ee.pbkdf2.hash;
+            updateShowOrHideOpenSslOptions();
+        }
+        function updateShowOrHideOpenSslOptions() {
             const elems = document.querySelectorAll(".openssl_aes_options");
             for (const elem of elems) {
-                if (e.target.checked) {
+                if (opensslAesCtrEncryptionInput.checked) {
                     elem.style.display = '';
                     // Hide command hint because the hint includes password
                     serverHostCommandHintTextarea.style.display = 'none';
@@ -258,6 +274,9 @@ const UI = {
                     serverHostCommandHintTextarea.style.display = '';
                 }
             }
+        }
+        opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
+            updateShowOrHideOpenSslOptions();
             setCommandHint();
         });
         opensslAesPasswordInput.addEventListener('input', setCommandHint);

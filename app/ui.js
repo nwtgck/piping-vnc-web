@@ -30,12 +30,14 @@ function createCommandHint() {
     const path2 = document.getElementById('path2_input').value;
     const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
     const opensslAesPassword = document.getElementById('openssl_aes_password').value;
+    const pbkdf2Iter = Number(document.getElementById("pbkdf2_iter").value);
+    const pbkdf2Hash = document.getElementById("pbkdf2_hash").value;
 
     if (path1 === '' || path2 === '') return;
 
     let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5901 | curl -sSNT - ${pipingServerUrl}/${path2}`;
     if (opensslAesCtrEncrypts) {
-        socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter 100000 -md sha256 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+        socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter ${pbkdf2Iter} -md ${pbkdf2Hash} | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter ${pbkdf2Iter} -md ${pbkdf2Hash} | curl -sSNT - ${pipingServerUrl}/${path2}`;
     }
     return socatCommand;
 }
@@ -230,6 +232,8 @@ const UI = {
         const serverToClientPathInput = document.getElementById('path2_input');
         const opensslAesCtrEncryptionInput = document.getElementById('openssl_aes_ctr_encryption');
         const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
+        const pbkdf2IterInput = document.getElementById('pbkdf2_iter');
+        const pbkdf2HashInput = document.getElementById('pbkdf2_hash');
         const serverHostCommandHintViewButton = document.getElementById('server_host_command_hint_view_button');
         const serverHostCommandHintTextarea = document.getElementById('server_host_command_hint_textarea');
         const pipingServerInput = document.getElementById('piping_server_input');
@@ -243,18 +247,22 @@ const UI = {
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
         opensslAesCtrEncryptionInput.addEventListener('input', (e) => {
-            const opensslAesPasswordSection = document.getElementById('openssl_aes_password_td');
-            if (e.target.checked) {
-                opensslAesPasswordSection.style.display = '';
-                // Hide command hint because the hint includes password
-                serverHostCommandHintTextarea.style.display = 'none';
-            } else {
-                opensslAesPasswordSection.style.display = 'none';
-                serverHostCommandHintTextarea.style.display = '';
+            const elems = document.querySelectorAll(".openssl_aes_options");
+            for (const elem of elems) {
+                if (e.target.checked) {
+                    elem.style.display = '';
+                    // Hide command hint because the hint includes password
+                    serverHostCommandHintTextarea.style.display = 'none';
+                } else {
+                    elem.style.display = 'none';
+                    serverHostCommandHintTextarea.style.display = '';
+                }
             }
             setCommandHint();
         });
         opensslAesPasswordInput.addEventListener('input', setCommandHint);
+        pbkdf2IterInput.addEventListener('input', setCommandHint);
+        pbkdf2HashInput.addEventListener('input', setCommandHint);
         serverHostCommandHintViewButton.addEventListener('click', () => {
             serverHostCommandHintTextarea.style.display = serverHostCommandHintTextarea.style.display === 'none' ? '' : 'none';
         });
@@ -1123,7 +1131,9 @@ const UI = {
         const pipingServerInput = document.getElementById('piping_server_input');
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
-        const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
+        const opensslAesPassword = document.getElementById('openssl_aes_password').value;
+        const pbkdf2Iter = Number(document.getElementById('pbkdf2_iter').value);
+        const pbkdf2Hash = document.getElementById('pbkdf2_hash').value;
         const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
 
         const pipingServerUrl = pipingServerInput.value.replace(/\/$/, '');
@@ -1142,9 +1152,20 @@ const UI = {
             opensslAesCtrDecryptPbkdf2Options = {
                 // TODO: hard code parameters
                 keyBits: 256,
-                password: opensslAesPasswordInput.value,
-                iterations: 100000,
-                hash: "SHA-256"
+                password: opensslAesPassword,
+                iterations: pbkdf2Iter,
+                hash: (() => {
+                    switch (pbkdf2Hash) {
+                        case "sha1":
+                            return "SHA-1";
+                        case "sha256":
+                            return "SHA-256";
+                        case "sha512":
+                            return "SHA-512";
+                        default:
+                            throw new Error(`unexpected hash: ${pbkdf2Hash}`);
+                    }
+                })(),
             };
         }
 

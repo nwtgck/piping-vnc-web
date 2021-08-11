@@ -33,6 +33,7 @@ This project is highly based on [noVNC]. Thanks to the original authors!
 e.g. <https://piping-vnc.nwtgck.org/vnc.html#?cs_path=aaa&sc_path=bbb>.  
 Use `#?`, which does not send parameters to the hosting server: piping-vnc.nwtgck.org.
 
+* `password`: VNC password
 * `server`: Piping Server URL
 * `cs_path`: Server-to-client path
 * `sc_path`: Client-to-server path

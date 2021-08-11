@@ -1361,6 +1361,12 @@ const UI = {
 
         Log.Warn("Server asked for credentials");
         UI.showStatus(_("Credentials are required"), "warning");
+
+        const password = parseHashAsQuery().get("password");
+        if (password !== null) {
+            document.getElementById('noVNC_password_input').value = password;
+            document.getElementById('noVNC_credentials_button').click();
+        }
     },
 
     setCredentials(e) {

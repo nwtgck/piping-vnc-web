@@ -37,6 +37,7 @@ Use `#?`, which does not send parameters to the hosting server: piping-vnc.nwtgc
 * `server`: Piping Server URL
 * `cs_path`: Server-to-client path
 * `sc_path`: Client-to-server path
+* `vnc_server_port`: VNC server port for command hint
 * `headers`: HTTP headers to Piping Server
   - (e.g. `[["X-MyExtra1", "myvalue1"], ["Content-Type", "application/myapp"]]`)
 * `e2ee`: E2E encryption option

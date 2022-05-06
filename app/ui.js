@@ -28,6 +28,7 @@ function createCommandHint() {
     const pipingServerUrl = document.getElementById('piping_server_input').value;
     const path1 = document.getElementById('path1_input').value;
     const path2 = document.getElementById('path2_input').value;
+    const vncServerPort = document.getElementById('vnc_server_port_input').value;
     const opensslAesCtrEncrypts = document.getElementById('openssl_aes_ctr_encryption').checked;
     const opensslAesPassword = document.getElementById('openssl_aes_password').value;
     const pbkdf2Iter = Number(document.getElementById("pbkdf2_iter").value);
@@ -35,9 +36,9 @@ function createCommandHint() {
 
     if (path1 === '' || path2 === '') return;
 
-    let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost 5901 | curl -sSNT - ${pipingServerUrl}/${path2}`;
+    let socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | nc localhost ${vncServerPort} | curl -sSNT - ${pipingServerUrl}/${path2}`;
     if (opensslAesCtrEncrypts) {
-        socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter ${pbkdf2Iter} -md ${pbkdf2Hash} | nc localhost 5901 | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter ${pbkdf2Iter} -md ${pbkdf2Hash} | curl -sSNT - ${pipingServerUrl}/${path2}`;
+        socatCommand = `curl -sSN ${pipingServerUrl}/${path1} | stdbuf -i0 -o0 openssl aes-256-ctr -d -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter ${pbkdf2Iter} -md ${pbkdf2Hash} | nc localhost ${vncServerPort} | stdbuf -i0 -o0 openssl aes-256-ctr -pass "pass:${opensslAesPassword}" -bufsize 1 -pbkdf2 -iter ${pbkdf2Iter} -md ${pbkdf2Hash} | curl -sSNT - ${pipingServerUrl}/${path2}`;
     }
     return socatCommand;
 }
@@ -230,6 +231,7 @@ const UI = {
 
         const clientToServerPathInput = document.getElementById('path1_input');
         const serverToClientPathInput = document.getElementById('path2_input');
+        const vncServerPortInput = document.getElementById('vnc_server_port_input');
         const opensslAesCtrEncryptionInput = document.getElementById('openssl_aes_ctr_encryption');
         const opensslAesPasswordInput = document.getElementById('openssl_aes_password');
         const pbkdf2IterInput = document.getElementById('pbkdf2_iter');
@@ -239,6 +241,7 @@ const UI = {
         const pipingServerInput = document.getElementById('piping_server_input');
         clientToServerPathInput.value = parseHashAsQuery().get('cs_path') || randomString(3);
         serverToClientPathInput.value = parseHashAsQuery().get('sc_path') || randomString(3);
+        vncServerPortInput.value = parseHashAsQuery().get("vnc_server_port") || 5901;
         const pipingServerUrlQuery = parseHashAsQuery().get('server');
         if (pipingServerUrlQuery) {
             pipingServerInput.value = decodeURIComponent(pipingServerUrlQuery);
@@ -246,6 +249,7 @@ const UI = {
         pipingServerInput.addEventListener('input', setCommandHint);
         clientToServerPathInput.addEventListener('input', setCommandHint);
         serverToClientPathInput.addEventListener('input', setCommandHint);
+        vncServerPortInput.addEventListener('input', setCommandHint);
         const e2eeRaw = parseHashAsQuery().get('e2ee');
         if (e2eeRaw !== null) {
             // e2ee JSON: { "cipher_type": "openssl-aes-256-ctr", "pass": string, "pbkdf2": { "iter": number, "hash": "sha1" | "sha256" | "sha512" } }

@@ -59,6 +59,7 @@ const supportsRequestStreamsPromise = (async () => {
     const supportsStreamsInRequestObjects = !new Request('', {
         method: 'POST',
         body: new ReadableStream(),
+        duplex: 'half',
     }).headers.has('Content-Type');
 
     if (!supportsStreamsInRequestObjects) return false;
@@ -66,6 +67,7 @@ const supportsRequestStreamsPromise = (async () => {
     return fetch('data:a/a;charset=utf-8,', {
         method: 'POST',
         body: new ReadableStream(),
+        duplex: 'half',
     }).then(() => true, () => false);
 })();
 

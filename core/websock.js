@@ -211,6 +211,7 @@ export default class Websock {
             headers: this._pipingServerHeaders,
             allowHTTP1ForStreamingUpload: true,
             signal: this._abortController.signal,
+            duplex: 'half',
         });
         (async () => {
             const getResPromise = fetch(urls.serverToClientUrl, {

@@ -209,7 +209,6 @@ export default class Websock {
             method: "POST",
             body: uploadReadableStream,
             headers: this._pipingServerHeaders,
-            allowHTTP1ForStreamingUpload: true,
             signal: this._abortController.signal,
             duplex: 'half',
         });

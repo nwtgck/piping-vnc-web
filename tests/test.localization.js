@@ -11,25 +11,12 @@ describe('Localization', function () {
             // environments, so we need to redefine it whilst running these
             // tests.
             origNavigator = Object.getOwnPropertyDescriptor(window, "navigator");
-            if (origNavigator === undefined) {
-                // Object.getOwnPropertyDescriptor() doesn't work
-                // properly in any version of IE
-                this.skip();
-            }
 
             Object.defineProperty(window, "navigator", {value: {}});
-            if (window.navigator.languages !== undefined) {
-                // Object.defineProperty() doesn't work properly in old
-                // versions of Chrome
-                this.skip();
-            }
-
             window.navigator.languages = [];
         });
         afterEach(function () {
-            if (origNavigator !== undefined) {
-                Object.defineProperty(window, "navigator", origNavigator);
-            }
+            Object.defineProperty(window, "navigator", origNavigator);
         });
 
         it('should use English by default', function () {

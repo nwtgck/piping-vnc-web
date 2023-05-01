@@ -617,7 +617,6 @@ export default class RFB extends EventTargetMixin {
 // =======
 //         if (this._url) {
         if (this._urls) {
-            console.log("!!!!!!!! HERE");
             Log.Info(`connecting to ${this._url}`);
             // this._sock.open(this._url, this._wsProtocols);
             this._sock.open(this._urls, this._wsProtocols);

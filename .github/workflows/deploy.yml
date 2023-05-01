@@ -8,6 +8,8 @@ on:
 
 jobs:
   npm:
+    # Always skip
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -47,6 +49,8 @@ jobs:
           github.event_name == 'push' &&
           github.event.ref == 'refs/heads/master'
   snap:
+    # Always skip
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

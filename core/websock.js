@@ -51,7 +51,6 @@ const rawChannelProps = [
 ];
 
 export default class Websock {
-// <<<<<<< HEAD
     /**
      * @param pipingServerHeaders can be undefined
      * @param opensslAesCtrDecryptPbkdf2Options can be undefined
@@ -64,10 +63,6 @@ export default class Websock {
         this._abortController = new AbortController();
         this._pipingServerHeaders = pipingServerHeaders;
         this._opensslAesCtrDecryptPbkdf2Options = opensslAesCtrDecryptPbkdf2Options;
-// =======
-//     constructor() {
-//         this._websocket = null;  // WebSocket or RTCDataChannel object
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
 
         this._rQi = 0;           // Receive queue index
         this._rQlen = 0;         // Next write position in the receive queue
@@ -209,15 +204,10 @@ export default class Websock {
     // Send Queue
 
     flush() {
-// <<<<<<< HEAD
         if (this._sQlen > 0 && this._isOpen) {
             // Wrapping Uint8Array for shallow coping
             const message = new Uint8Array(this._encodeMessage());
             this._readableStreamController.enqueue(message);
-// =======
-//         if (this._sQlen > 0 && this.readyState === 'open') {
-//             this._websocket.send(this._encodeMessage());
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
             this._sQlen = 0;
         }
     }
@@ -252,7 +242,6 @@ export default class Websock {
         this._websocket = null;
     }
 
-// <<<<<<< HEAD
     open(urls, protocols) {
         this.init();
 
@@ -260,32 +249,6 @@ export default class Websock {
         let uploadReadableStream = new ReadableStream({
             start(ctrl) {
                 self._readableStreamController = ctrl;
-// =======
-//     open(uri, protocols) {
-//         this.attach(new WebSocket(uri, protocols));
-//     }
-//
-//     attach(rawChannel) {
-//         this.init();
-//
-//         // Must get object and class methods to be compatible with the tests.
-//         const channelProps = [...Object.keys(rawChannel), ...Object.getOwnPropertyNames(Object.getPrototypeOf(rawChannel))];
-//         for (let i = 0; i < rawChannelProps.length; i++) {
-//             const prop = rawChannelProps[i];
-//             if (channelProps.indexOf(prop) < 0) {
-//                 throw new Error('Raw channel missing property: ' + prop);
-//             }
-//         }
-//
-//         this._websocket = rawChannel;
-//         this._websocket.binaryType = "arraybuffer";
-//         this._websocket.onmessage = this._recvMessage.bind(this);
-//
-//         this._websocket.onopen = () => {
-//             Log.Debug('>> WebSock.onopen');
-//             if (this._websocket.protocol) {
-//                 Log.Info("Server choose sub-protocol: " + this._websocket.protocol);
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
             }
         });
         if (this._opensslAesCtrDecryptPbkdf2Options !== undefined) {
@@ -307,7 +270,6 @@ export default class Websock {
             this._isOpen = true;
             Log.Debug('>> Open');
             this._eventHandlers.open();
-// <<<<<<< HEAD
 
             let downloadReadableStream = getRes.body;
             if (this._opensslAesCtrDecryptPbkdf2Options !== undefined) {
@@ -329,33 +291,6 @@ export default class Websock {
         if (this._abortController.signal) {
             Log.Info("Closing HTTPS connection over Piping Server");
             this._abortController.abort();
-// =======
-//             Log.Debug("<< WebSock.onopen");
-//         };
-//
-//         this._websocket.onclose = (e) => {
-//             Log.Debug(">> WebSock.onclose");
-//             this._eventHandlers.close(e);
-//             Log.Debug("<< WebSock.onclose");
-//         };
-//
-//         this._websocket.onerror = (e) => {
-//             Log.Debug(">> WebSock.onerror: " + e);
-//             this._eventHandlers.error(e);
-//             Log.Debug("<< WebSock.onerror: " + e);
-//         };
-//     }
-//
-//     close() {
-//         if (this._websocket) {
-//             if (this.readyState === 'connecting' ||
-//                 this.readyState === 'open') {
-//                 Log.Info("Closing WebSocket connection");
-//                 this._websocket.close();
-//             }
-//
-//             this._websocket.onmessage = () => {};
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
         }
     }
 

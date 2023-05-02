@@ -6,10 +6,8 @@ chai.use(function (_chai, utils) {
     _chai.Assertion.addMethod('displayed', function (targetData, cmp=_equal) {
         const obj = this._obj;
         const ctx = obj._target.getContext('2d');
-        const dataCl = ctx.getImageData(0, 0, obj._target.width, obj._target.height).data;
-        // NB(directxman12): PhantomJS 1.x doesn't implement Uint8ClampedArray, so work around that
-        const data = new Uint8Array(dataCl);
-        const len = dataCl.length;
+        const data = ctx.getImageData(0, 0, obj._target.width, obj._target.height).data;
+        const len = data.length;
         new chai.Assertion(len).to.be.equal(targetData.length, "unexpected display size");
         let same = true;
         for (let i = 0; i < len; i++) {
@@ -31,12 +29,6 @@ chai.use(function (_chai, utils) {
 
     _chai.Assertion.addMethod('sent', function (targetData) {
         const obj = this._obj;
-        obj.inspect = () => {
-            const res = { _websocket: obj._websocket, rQi: obj._rQi, _rQ: new Uint8Array(obj._rQ.buffer, 0, obj._rQlen),
-                          _sQ: new Uint8Array(obj._sQ.buffer, 0, obj._sQlen) };
-            res.prototype = obj;
-            return res;
-        };
         const data = obj._websocket._getSentData();
         let same = true;
         if (data.length != targetData.length) {

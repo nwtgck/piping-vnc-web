@@ -17,61 +17,40 @@
 
     <meta charset="utf-8">
 
-    <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
-                Remove this if you use the .htaccess -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
-    <!-- nwtgck.org -->
-    <meta http-equiv="origin-trial" content="AjepJ0oXUzAiD+DknVsVaOMa/p/dkt64dCyGx8dOV3/MwX+gSBpIJ3xEHDWCQkQK9eQ90j4m9+eLIDOOMmoyRAAAAABreyJvcmlnaW4iOiJodHRwczovL253dGdjay5vcmc6NDQzIiwiZmVhdHVyZSI6IkZldGNoVXBsb2FkU3RyZWFtaW5nIiwiZXhwaXJ5IjoxNjM2NTAyMzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=">
-    <!-- netlify -->
-    <meta http-equiv="origin-trial" content="AqenK/zDlIqzBFoJ5aIyuwL2T+QQQhZPUErc158HZeXgqNSQa4oj1+fLgnGfeUn6o6obF9ReKbiz9nwCS8XoBAsAAABkeyJvcmlnaW4iOiJodHRwczovL3BpcGluZy12bmMubmV0bGlmeS5hcHA6NDQzIiwiZmVhdHVyZSI6IkZldGNoVXBsb2FkU3RyZWFtaW5nIiwiZXhwaXJ5IjoxNjM2NTAyMzk5fQ==">
     <link rel="canonical" href="https://piping-vnc.nwtgck.org" />
 
-    <!-- Icons (see app/images/icons/Makefile for what the sizes are for) -->
-    <link rel="icon" sizes="16x16" type="image/png" href="app/images/icons/novnc-16x16.png">
-    <link rel="icon" sizes="24x24" type="image/png" href="app/images/icons/novnc-24x24.png">
-    <link rel="icon" sizes="32x32" type="image/png" href="app/images/icons/novnc-32x32.png">
-    <link rel="icon" sizes="48x48" type="image/png" href="app/images/icons/novnc-48x48.png">
-    <link rel="icon" sizes="60x60" type="image/png" href="app/images/icons/novnc-60x60.png">
-    <link rel="icon" sizes="64x64" type="image/png" href="app/images/icons/novnc-64x64.png">
-    <link rel="icon" sizes="72x72" type="image/png" href="app/images/icons/novnc-72x72.png">
-    <link rel="icon" sizes="76x76" type="image/png" href="app/images/icons/novnc-76x76.png">
-    <link rel="icon" sizes="96x96" type="image/png" href="app/images/icons/novnc-96x96.png">
-    <link rel="icon" sizes="120x120" type="image/png" href="app/images/icons/novnc-120x120.png">
-    <link rel="icon" sizes="144x144" type="image/png" href="app/images/icons/novnc-144x144.png">
-    <link rel="icon" sizes="152x152" type="image/png" href="app/images/icons/novnc-152x152.png">
-    <link rel="icon" sizes="192x192" type="image/png" href="app/images/icons/novnc-192x192.png">
-    <!-- Firefox currently mishandles SVG, see #1419039
-    <link rel="icon" sizes="any" type="image/svg+xml" href="app/images/icons/novnc-icon.svg">
-    -->
-    <!-- Repeated last so that legacy handling will pick this -->
-    <link rel="icon" sizes="16x16" type="image/png" href="app/images/icons/novnc-16x16.png">
+    <link rel="icon" type="image/x-icon" href="app/images/icons/novnc.ico">
 
     <!-- Apple iOS Safari settings -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Home Screen Icons (favourites and bookmarks use the normal icons) -->
-    <link rel="apple-touch-icon" sizes="60x60" type="image/png" href="app/images/icons/novnc-60x60.png">
-    <link rel="apple-touch-icon" sizes="76x76" type="image/png" href="app/images/icons/novnc-76x76.png">
-    <link rel="apple-touch-icon" sizes="120x120" type="image/png" href="app/images/icons/novnc-120x120.png">
-    <link rel="apple-touch-icon" sizes="152x152" type="image/png" href="app/images/icons/novnc-152x152.png">
+
+    <!-- @2x -->
+    <link rel="apple-touch-icon" sizes="40x40" type="image/png" href="app/images/icons/novnc-ios-40.png">
+    <link rel="apple-touch-icon" sizes="58x58" type="image/png" href="app/images/icons/novnc-ios-58.png">
+    <link rel="apple-touch-icon" sizes="80x80" type="image/png" href="app/images/icons/novnc-ios-80.png">
+    <link rel="apple-touch-icon" sizes="120x120" type="image/png" href="app/images/icons/novnc-ios-120.png">
+    <link rel="apple-touch-icon" sizes="152x152" type="image/png" href="app/images/icons/novnc-ios-152.png">
+    <link rel="apple-touch-icon" sizes="167x167" type="image/png" href="app/images/icons/novnc-ios-167.png">
+    <!-- @3x -->
+    <link rel="apple-touch-icon" sizes="60x60" type="image/png" href="app/images/icons/novnc-ios-60.png">
+    <link rel="apple-touch-icon" sizes="87x87" type="image/png" href="app/images/icons/novnc-ios-87.png">
+    <link rel="apple-touch-icon" sizes="120x120" type="image/png" href="app/images/icons/novnc-ios-120.png">
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="app/images/icons/novnc-ios-180.png">
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="app/styles/base.css">
+    <link rel="stylesheet" href="app/styles/input.css">
 
-    <!-- this is included as a normal file in order to catch script-loading errors as well -->
-    <script src="app/error-handler.js"></script>
+    <!-- Images that will later appear via CSS -->
+    <link rel="preload" as="image" href="app/images/info.svg">
+    <link rel="preload" as="image" href="app/images/error.svg">
+    <link rel="preload" as="image" href="app/images/warning.svg">
 
-    <!-- begin scripts -->
-    <!-- promise polyfills promises for IE11 -->
-    <script src="vendor/promise.js"></script>
-    <!-- ES2015/ES6 modules polyfill -->
-    <script nomodule src="vendor/browser-es-module-loader/dist/browser-es-module-loader.js"></script>
     <script src="vendor/openssl-aes-ctr-stream-npm/dist/browserify_bundle.js"></script>
-    <!-- actual script modules -->
+    <script type="module" crossorigin="anonymous" src="app/error-handler.js"></script>
     <script type="module" crossorigin="anonymous" src="app/ui.js"></script>
-    <!-- end scripts -->
 </head>
 
 <body>
@@ -93,6 +72,8 @@
             <div class="noVNC_scroll">
 
             <h1 class="noVNC_logo" translate="no"><span>no</span><br>VNC</h1>
+
+            <hr>
 
             <!-- Drag/Pan the viewport -->
             <input type="image" alt="Drag" src="app/images/drag.svg"
@@ -156,17 +137,17 @@
                 <div class="noVNC_heading">
                     <img alt="" src="app/images/clipboard.svg"> Clipboard
                 </div>
+                <p class="noVNC_subheading">
+                    Edit clipboard content in the textarea below.
+                </p>
                 <textarea id="noVNC_clipboard_text" rows=5></textarea>
-                <br>
-                <input id="noVNC_clipboard_clear_button" type="button"
-                    value="Clear" class="noVNC_submit">
             </div>
             </div>
 
             <!-- Toggle fullscreen -->
-            <input type="image" alt="Fullscreen" src="app/images/fullscreen.svg"
+            <input type="image" alt="Full Screen" src="app/images/fullscreen.svg"
                 id="noVNC_fullscreen_button" class="noVNC_button noVNC_hidden"
-                title="Fullscreen">
+                title="Full Screen">
 
             <!-- Settings -->
             <input type="image" alt="Settings" src="app/images/settings.svg"
@@ -174,10 +155,10 @@
                 title="Settings">
             <div class="noVNC_vcenter">
             <div id="noVNC_settings" class="noVNC_panel">
+                <div class="noVNC_heading">
+                    <img alt="" src="app/images/settings.svg"> Settings
+                </div>
                 <ul>
-                    <li class="noVNC_heading">
-                        <img alt="" src="app/images/settings.svg"> Settings
-                    </li>
                     <li>
                         <label><input id="noVNC_setting_shared" type="checkbox"> Shared Mode</label>
                     </li>
@@ -273,9 +254,12 @@
             </div>
         </div>
 
-        <div id="noVNC_control_bar_hint"></div>
-
     </div> <!-- End of noVNC_control_bar -->
+
+    <div id="noVNC_hint_anchor" class="noVNC_vcenter">
+        <div id="noVNC_control_bar_hint">
+        </div>
+    </div>
 
     <!-- Status Dialog -->
     <div id="noVNC_status"></div>
@@ -283,12 +267,19 @@
     <!-- Connect button -->
     <div class="noVNC_center">
         <div id="noVNC_connect_dlg">
-            <div class="noVNC_logo" translate="no"><span>Piping</span>VNC</div>
-            <div style="font-size: 1.5em;" class="noVNC_logo" translate="no">
+            <p class="noVNC_logo" translate="no"><span>Piping</span>VNC</p>
+            <p style="font-size: 1.5em;" class="noVNC_logo" translate="no">
                 <span style="color: #ccc; font-size: 0.8em;">powered by </span>
                 <span>no</span>VNC
-            </div>
-            <div id="input_form">
+            </p>
+            <span id="not_supported_message" style="display: none;">
+                <p style="font-size: 1.5rem; text-align: center; color: white; margin-bottom: 2em;">
+                    ⚠️ This browser is not supported.<br>
+                    Use Google Chrome 85 or above and enable new feature by:<br>
+                    "chrome://flags/ > Experimental Web Platform features > Enabled"
+                </p>
+            </span>
+            <span id="input_form">
                 <table style="background: #ccc; border-radius: 12px; padding: 0.8em; display: block; margin-bottom: 1em;">
                     <tr>
                         <td>Piping Server</td><td><input id="piping_server_input" value="https://ppng.io"></td>
@@ -322,23 +313,18 @@
                         </td>
                     </tr>
                 </table>
-                <div style="background: #ccc; border-radius: 12px; padding: 0.8em; margin-bottom: 1em;">
+                <p style="background: #ccc; border-radius: 12px; padding: 0.8em; margin-bottom: 1em;">
                     Command hint:<br>
                     VNC server port: <input id="vnc_server_port_input" type="number"><br>
-                    <textarea id="server_host_command_hint_textarea" style="width: 100%"></textarea>
+                    <textarea id="server_host_command_hint_textarea" style="width: 100%; font-size: 0.8rem;"></textarea>
                     <button id="server_host_command_hint_view_button" style="color: #444">Show/Hide</button>
-                </div>
-                <div id="noVNC_connect_button"><div>
-                    <img alt="" src="app/images/connect.svg"> Connect
-                </div></div>
-            </div>
-            <div id="not_supported_message" style="font-size: 1.5em; display: none;">
-                <p style="text-align: center; color: white; margin-bottom: 2em;">
-                    ⚠️ This browser is not supported.<br>
-                    Use Google Chrome 85 or above and enable new feature by:<br>
-                    "chrome://flags/ > Experimental Web Platform features > Enabled"
                 </p>
-            </div>
+                <div>
+                    <button id="noVNC_connect_button">
+                        <img alt="" src="app/images/connect.svg"> Connect
+                    </button>
+                </div>
+            </span>
             <p style="text-align: center">
                 <a href="https://github.com/nwtgck/piping-vnc-web" target="_blank" style="color: white;">
                     <svg style="width: 1em; vertical-align: middle; margin-right: 10px;" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z" class=""></path>
@@ -349,22 +335,47 @@
         </div>
     </div>
 
+    <!-- Server Key Verification Dialog -->
+    <div class="noVNC_center noVNC_connect_layer">
+    <div id="noVNC_verify_server_dlg" class="noVNC_panel"><form>
+        <div class="noVNC_heading">
+            Server identity
+        </div>
+        <div>
+            The server has provided the following identifying information:
+        </div>
+        <div id="noVNC_fingerprint_block">
+            <b>Fingerprint:</b>
+            <span id="noVNC_fingerprint"></span>
+        </div>
+        <div>
+            Please verify that the information is correct and press
+            "Approve". Otherwise press "Reject".
+        </div>
+        <div>
+            <input id="noVNC_approve_server_button" type="submit" value="Approve" class="noVNC_submit">
+            <input id="noVNC_reject_server_button" type="button" value="Reject" class="noVNC_submit">
+        </div>
+    </form></div>
+    </div>
+
     <!-- Password Dialog -->
     <div class="noVNC_center noVNC_connect_layer">
     <div id="noVNC_credentials_dlg" class="noVNC_panel"><form>
-        <ul>
-            <li id="noVNC_username_block">
-                <label>Username:</label>
-                <input id="noVNC_username_input">
-            </li>
-            <li id="noVNC_password_block">
-                <label>Password:</label>
-                <input id="noVNC_password_input" type="password">
-            </li>
-            <li>
-                <input id="noVNC_credentials_button" type="submit" value="Send Credentials" class="noVNC_submit">
-            </li>
-        </ul>
+        <div class="noVNC_heading">
+            Credentials
+        </div>
+        <div id="noVNC_username_block">
+            <label for="noVNC_username_input">Username:</label>
+            <input id="noVNC_username_input">
+        </div>
+        <div id="noVNC_password_block">
+            <label for="noVNC_password_input">Password:</label>
+            <input id="noVNC_password_input" type="password">
+        </div>
+        <div>
+            <input id="noVNC_credentials_button" type="submit" value="Send Credentials" class="noVNC_submit">
+        </div>
     </form></div>
     </div>
 

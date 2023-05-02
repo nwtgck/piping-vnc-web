@@ -1,0 +1,18 @@
+name: Translate
+
+on: [push, pull_request]
+
+jobs:
+  translate:
+    # Always skip
+    # FIXME: msgcat: input file 'noVNC.html.pot' doesn't contain a header entry with a charset specification
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm update
+      - run: sudo apt-get install gettext
+      - run: make -C po update-pot
+      - run: make -C po update-po
+      - run: make -C po update-js

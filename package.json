@@ -1,6 +1,7 @@
 {
-  "name": "@novnc/novnc",
+  "name": "piping-vnc",
   "version": "1.4.0",
+  "private": true,
   "description": "An HTML5 VNC client",
   "browser": "lib/rfb",
   "directories": {

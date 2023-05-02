@@ -270,63 +270,11 @@ export default class RFB extends EventTargetMixin {
 
         this._gestures = new GestureHandler();
 
-// <<<<<<< HEAD
         this._sock = new Websock(this._pipingServerHeaders, this._opensslAesCtrDecryptPbkdf2Options);
-//         this._sock.on('message', () => {
-//             this._handleMessage();
-//         });
-//         this._sock.on('open', () => {
-//             if ((this._rfbConnectionState === 'connecting') &&
-//                 (this._rfbInitState === '')) {
-//                 this._rfbInitState = 'ProtocolVersion';
-//                 Log.Debug("Starting VNC handshake");
-//             } else {
-//                 this._fail("Unexpected server connection while " +
-//                            this._rfbConnectionState);
-//             }
-//         });
-//         this._sock.on('close', (e) => {
-//             Log.Debug("WebSocket on-close event");
-//             let msg = "";
-//             if (e.code) {
-//                 msg = "(code: " + e.code;
-//                 if (e.reason) {
-//                     msg += ", reason: " + e.reason;
-//                 }
-//                 msg += ")";
-//             }
-//             switch (this._rfbConnectionState) {
-//                 case 'connecting':
-//                     this._fail("Connection closed " + msg);
-//                     break;
-//                 case 'connected':
-//                     // Handle disconnects that were initiated server-side
-//                     this._updateConnectionState('disconnecting');
-//                     this._updateConnectionState('disconnected');
-//                     break;
-//                 case 'disconnecting':
-//                     // Normal disconnection path
-//                     this._updateConnectionState('disconnected');
-//                     break;
-//                 case 'disconnected':
-//                     this._fail("Unexpected server disconnect " +
-//                                "when already disconnected " + msg);
-//                     break;
-//                 default:
-//                     this._fail("Unexpected server disconnect before connecting " +
-//                                msg);
-//                     break;
-//             }
-//             this._sock.off('close');
-//         });
-//         this._sock.on('error', e => Log.Warn("WebSocket on-error event"));
-// =======
-//         this._sock = new Websock();
         this._sock.on('open', this._socketOpen.bind(this));
         this._sock.on('close', this._socketClose.bind(this));
         this._sock.on('message', this._handleMessage.bind(this));
         this._sock.on('error', this._socketError.bind(this));
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
 
         this._expectedClientWidth = null;
         this._expectedClientHeight = null;
@@ -603,22 +551,8 @@ export default class RFB extends EventTargetMixin {
     _connect() {
         Log.Debug(">> RFB.connect");
 
-// <<<<<<< HEAD
-        Log.Info("connecting to " + JSON.stringify(this._urls));
-
-//         try {
-//             // WebSocket.onopen transitions to the RFB init states
-//             this._sock.open(this._urls, this._wsProtocols);
-//         } catch (e) {
-//             if (e.name === 'SyntaxError') {
-//                 this._fail("Invalid host or port (" + e + ")");
-//             } else {
-//                 this._fail("Error when opening socket (" + e + ")");
-// =======
-//         if (this._url) {
         if (this._urls) {
-            Log.Info(`connecting to ${this._url}`);
-            // this._sock.open(this._url, this._wsProtocols);
+            Log.Info(`connecting to ${JSON.stringify(this._urls)}`);
             this._sock.open(this._urls, this._wsProtocols);
         } else {
             Log.Info(`attaching ${this._rawChannel} to Websock`);
@@ -633,7 +567,6 @@ export default class RFB extends EventTargetMixin {
                 //        isn't allowed this early, but I'm not sure that can
                 //        happen without a bug messing up our state variables
                 this._socketOpen();
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
             }
         }
 

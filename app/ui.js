@@ -7,17 +7,11 @@
  */
 
 import * as Log from '../core/util/logging.js';
-// <<<<<<< HEAD
-// import _, {l10n} from './localization.js';
-// import {dragThreshold, hasScrollbarGutter, isSafari, isTouchDevice} from '../core/util/browser.js';
-// import {getPointerEvent, setCapture} from '../core/util/events.js';
-// =======
 import _, { l10n } from './localization.js';
 import { isTouchDevice, isMac, isIOS, isAndroid, isChromeOS, isSafari,
          hasScrollbarGutter, dragThreshold }
     from '../core/util/browser.js';
 import { setCapture, getPointerEvent } from '../core/util/events.js';
-// >>>>>>> 90455eef0692d2e35276fd31286114d0955016b0
 import KeyTable from "../core/input/keysym.js";
 import keysyms from "../core/input/keysymdef.js";
 import Keyboard from "../core/input/keyboard.js";

@@ -14,7 +14,7 @@ jobs:
       - name: Build openssl-aes-ctr-stream
         run: npm run build-openssl-aes-ctr-stream
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v2.0
+        uses: nwtgck/actions-netlify@v2.1
         with:
           publish-dir: './'
           production-branch: master
